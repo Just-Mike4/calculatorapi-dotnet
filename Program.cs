@@ -2,17 +2,18 @@ using CalculatorApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Register services
+// Register strategy pattern services
+builder.Services.AddScoped<IOperationStrategy, AddOperation>();
+builder.Services.AddScoped<IOperationStrategy, SubtractOperation>();
+builder.Services.AddScoped<IOperationStrategy, MultiplyOperation>();
 builder.Services.AddScoped<ICalculatorService, CalculatorService>();
 
-// Add Swagger and Controllers
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Swagger UI
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

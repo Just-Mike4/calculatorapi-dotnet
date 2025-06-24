@@ -2,23 +2,35 @@ using CalculatorApi.Models;
 
 namespace CalculatorApi.Services
 {
+    public interface ICalculatorService
+    {
+        CalculatorResult Calculate(double operand1, double operand2, string operation);
+    }
+
     public class CalculatorService : ICalculatorService
     {
-        public CalculatorResult Calculate(CalculatorRequest request)
+        private readonly IEnumerable<IOperationStrategy> _strategies;
+
+        public CalculatorService(IEnumerable<IOperationStrategy> strategies)
         {
-            double result = request.Operation.ToLower() switch
-            {
-                "add" => request.Operand1 + request.Operand2,
-                "subtract" => request.Operand1 - request.Operand2,
-                "multiply" => request.Operand1 * request.Operand2,
-                _ => throw new ArgumentException("Unsupported operation. Use 'add', 'subtract', or 'multiply'.")
-            };
+            _strategies = strategies;
+        }
+
+        public CalculatorResult Calculate(double operand1, double operand2, string operation)
+        {
+            var strategy = _strategies.FirstOrDefault(s =>
+                s.OperationName.Equals(operation, StringComparison.OrdinalIgnoreCase));
+
+            if (strategy == null)
+                throw new ArgumentException("Unsupported operation. Use add, subtract, or multiply.");
+
+            var result = strategy.Calculate(operand1, operand2);
 
             return new CalculatorResult
             {
-                Operand1 = request.Operand1,
-                Operand2 = request.Operand2,
-                Operation = request.Operation,
+                Operand1 = operand1,
+                Operand2 = operand2,
+                Operation = operation,
                 Result = result
             };
         }

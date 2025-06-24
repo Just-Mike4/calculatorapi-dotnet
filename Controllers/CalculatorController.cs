@@ -15,12 +15,17 @@ namespace CalculatorApi.Controllers
             _calculatorService = calculatorService;
         }
 
-        [HttpPost]
-        public IActionResult Calculate([FromBody] CalculatorRequest request)
+        [HttpGet]
+        [ProducesResponseType(typeof(CalculatorResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+        public IActionResult Calculate(
+            [FromQuery] double operand1,
+            [FromQuery] double operand2,
+            [FromQuery] string operation)
         {
             try
             {
-                var result = _calculatorService.Calculate(request);
+                var result = _calculatorService.Calculate(operand1, operand2, operation);
                 return Ok(result);
             }
             catch (ArgumentException ex)
